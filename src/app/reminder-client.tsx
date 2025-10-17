@@ -38,8 +38,6 @@ export default function ReminderClient() {
   const [mounted, setMounted] = useState(false);
   const [permission, setPermission] =
     useState<NotificationPermission>("default");
-  const [lastSentAt, setLastSentAt] = useState<number | null>(null);
-  const [lastMessage, setLastMessage] = useState<string | null>(null);
   const intervalRef = useRef<number | null>(null);
   const startedRef = useRef(false);
   const messageIndexRef = useRef(0);
@@ -123,10 +121,8 @@ export default function ReminderClient() {
         icon: "/favicon.ico",
         badge: "/favicon.ico",
         tag: "posture-reminder",
-        renotify: true,
         requireInteraction: true,
         silent: false,
-        vibrate: [100, 50, 100],
       };
       if (activeReg) {
         await activeReg.showNotification(title, options);
@@ -135,8 +131,6 @@ export default function ReminderClient() {
         new Notification(title, options);
         console.log("showNotification: via Notification constructor");
       }
-      setLastMessage(body);
-      setLastSentAt(Date.now());
     } catch (err) {
       console.error("Notification error", err);
       alert(
