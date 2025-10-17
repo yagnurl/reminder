@@ -116,19 +116,34 @@ export default function ReminderClient() {
         readyReg || (await navigator.serviceWorker.getRegistration());
       const title = "Dik otur!";
       const body = customBody ?? getNextMessage();
+      const tag = "posture-reminder";
       const options: NotificationOptions = {
         body,
         icon: "/favicon.ico",
         badge: "/favicon.ico",
-        tag: "posture-reminder",
+        tag,
         requireInteraction: true,
         silent: false,
       };
       if (activeReg) {
         await activeReg.showNotification(title, options);
+        // Auto-close after 5 seconds
+        window.setTimeout(async () => {
+          try {
+            const list = await activeReg.getNotifications();
+            list.forEach((n) => {
+              if (n.tag === tag) n.close();
+            });
+          } catch {}
+        }, 5000);
         console.log("showNotification: via service worker");
       } else {
-        new Notification(title, options);
+        const n = new Notification(title, options);
+        window.setTimeout(() => {
+          try {
+            n.close();
+          } catch {}
+        }, 5000);
         console.log("showNotification: via Notification constructor");
       }
     } catch (err) {
